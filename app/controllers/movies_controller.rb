@@ -11,28 +11,45 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @sort_by = params[:sort_by]
     @all_ratings = Movie.all_ratings
-    @selected_ratings = @all_ratings
+    session[:ratings] ||= @all_ratings
+    session[:sort_by] ||= :none
     
-    if params[:ratings] == nil
-      @movies = Movie.all
+    # See if params are different from those we've stored
+    
+    if params.include?(:ratings)
+      if params_has_new_ratings?(params, session)
+        session[:ratings] = params[:ratings].keys
+      end
     else
-      @selected_ratings = params[:ratings].keys
-      @movies = Movie.where(rating: @selected_ratings)
+      should_redirect = true
     end
     
-    if @sort_by != nil
+    if params.include?(:sort_by)
+      if params_has_new_sort_by?(params, session)
+        session[:sort_by] = params[:sort_by].to_sym
+      end
+    else
+      should_redirect = true
+    end
+
+    
+    # Session has been set with most current params
+    
+    if should_redirect
+      redirect_to(controller: "movies", action: "index", 
+                  ratings: to_ratings_hash(session[:ratings]), 
+                  sort_by: session[:sort_by])
+    end
+    
+    @selected_ratings = session[:ratings]
+    @sort_by = session[:sort_by]
+    
+    @movies = Movie.where(rating: @selected_ratings)
+    
+    if @sort_by != :none && @sort_by != 'none'
       @movies = @movies.sort_by { |movie| movie.send @sort_by }
     end
-    # case @sort_by
-    # when "title"
-    #   @movies = @movies.sort_by { |movie| movie.title }
-    # when "release_date"
-    #   @movies = @movies.sort_by { |movie| movie.release_date }
-    # else
-    #   @movies = Movie.all
-    # end
   end
 
   def new
@@ -61,6 +78,20 @@ class MoviesController < ApplicationController
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
+  end
+
+  private
+
+  def params_has_new_ratings?(params_dict, session_dict)
+    params_dict[:ratings].keys.sort != session_dict[:ratings].sort
+  end
+  
+  def params_has_new_sort_by?(params_dict, session_dict)
+    params_dict[:sort_by] != session_dict[:sort_by].to_sym
+  end
+  
+  def to_ratings_hash(ratings_arr)
+    Hash[ratings_arr.map {|rating| [rating, 1]}]
   end
 
 end

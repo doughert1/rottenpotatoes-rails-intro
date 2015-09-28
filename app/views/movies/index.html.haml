@@ -11,10 +11,10 @@
 %table#movies
   %thead
     %tr
-      %th{class: "#{@sort_by == 'title' ? 'hilite' : ''}"}
+      %th{class: "#{@sort_by == :title ? 'hilite' : ''}"}
         %a#title_header{href: "movies?sort_by=title"} Movie Title
       %th Rating
-      %th{class: "#{@sort_by == 'release_date' ? 'hilite' : ''}"}
+      %th{class: "#{@sort_by == :release_date ? 'hilite' : ''}"}
         %a#release_date_header{href: "movies?sort_by=release_date"} Release Date
       %th More Info
   %tbody
