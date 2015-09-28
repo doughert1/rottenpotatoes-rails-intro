@@ -46,6 +46,8 @@ group :development, :test do
 
   gem 'rspec-rails'
   gem 'autotest'
+  
+  gem 'sqlite3'
 end
 
 group :production do
