@@ -37,6 +37,7 @@ class MoviesController < ApplicationController
     # Session has been set with most current params
     
     if should_redirect
+      flash.keep()
       redirect_to(controller: "movies", action: "index", 
                   ratings: to_ratings_hash(session[:ratings]), 
                   sort_by: session[:sort_by])
