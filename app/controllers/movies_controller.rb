@@ -14,6 +14,7 @@ class MoviesController < ApplicationController
     @all_ratings = Movie.all_ratings
     session[:ratings] ||= @all_ratings
     session[:sort_by] ||= :none
+    should_redirect = false
     
     # See if params are different from those we've stored
     
